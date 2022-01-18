@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Moje oferty</title>
+</head>
+
+<body>
+
+    <div class="container">
+        <div class="header">
+            <nav>
+                <ul class="naglowek">
+                    <li role="presentation"><a href="home">Strona domowa</a></li>
+                    <li role="presentation"><a href="dodajOferte">Stworz oferte</a></li>
+                    <li role="presentation" class="active"><a href="#">Moje oferty</a></li>
+                    <li role="presentation"><a href="mojeDane">Moje dane</a></li>
+                    <li role="presentation"><a href="logowanie">Logowanie</a></li>
+                    <li role="presentation"><a href="rejestracja">Tworzenie konta</a></li>
+                    <li role="presentation"><a href="wyloguj">Wyloguj sie</a></li>
+                </ul>
+            </nav>
+            <h3 style="color: green; text-align: left">{{msg}}</h3>
+        </div>
+
+        <h1>Lista moich ofert</h1>
+
+        <hr>
+        {% for oferta in listaOfert %}
+        <h1 style="font-size:25px">{{ oferta['nazwa_produktu'] }}</h1>
+        <span>Ilosc: {{ oferta['ilosc_szt'] }}</span>
+        <br />
+        <span>Cena: {{ oferta['cena'] }}</span>
+        <br />
+        <span>Opis: {{ oferta['opis'] }}</span>
+        <br />
+        <form method="POST">
+            <button type="submit" style="color:red" value="{{ oferta['ID_oferty'] }}" name="usun">Usun</button>
+        </form>
+        <hr>
+        {% endfor %}
+
+    </div>
+</body>
+
+</html>

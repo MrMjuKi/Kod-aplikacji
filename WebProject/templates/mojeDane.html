@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Moje dane</title>
+</head>
+
+<body>
+
+    <div class="container">
+        <div class="header">
+            <nav>
+                <ul class="naglowek">
+                    <li role="presentation"><a href="home">Strona domowa</a></li>
+                    <li role="presentation"><a href="dodajOferte">Stworz oferte</a></li>
+                    <li role="presentation"><a href="mojeOferty">Moje oferty</a></li>
+                    <li role="presentation" class="active"><a href="#">Moje dane</a></li>
+                    <li role="presentation"><a href="logowanie">Logowanie</a></li>
+                    <li role="presentation"><a href="rejestracja">Tworzenie konta</a></li>
+                    <li role="presentation"><a href="wyloguj">Wyloguj sie</a></li>
+                </ul>
+            </nav>
+        </div>
+
+        <div class="formularz_personalnych_danych">
+            <h1>Prosze uzupelnic lub edytowac informacje o sobie, a nastepnie zatwierdzic je przyciskiem "Zapisz zmiany" {{msg}}</h1>
+            {% for mojeDane in mojeDane %}
+            <form method="POST">
+                <label for="inputName" class="sr-only">Imie:</label>
+                <input type="text" name="inputName" id="inputName" class="form-control" placeholder="Imie" value="{{mojeDane['imie']}}" autofocus>
+
+                <label for="inputSurname" class="sr-only">Nazwisko:</label>
+                <input type="text" name="inputSurname" id="inputSurname" class="form-control" placeholder="Nazwisko" value="{{mojeDane['nazwisko']}}" autofocus>
+
+                <label for="inputNumber" class="sr-only">Numer telefonu:</label>
+                <input type="text" name="inputNumber" id="inputNumber" class="form-control" placeholder="Numer telefonu" value="{{mojeDane['nr_telefonu']}}" autofocus>
+
+                <button type="submit">Zapisz zmiany</button>
+            </form>
+            {% endfor %}
+        </div>
+
+
+    </div>
+</body>
+</html>

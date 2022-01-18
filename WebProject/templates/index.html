@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Strona glowna</title>
+</head>
+
+<body>
+
+    <div class="container">
+        <div class="header">
+            <nav>
+                <ul class="naglowek">
+                    <li role="presentation" class="active"><a href="home">Strona domowa</a></li>
+                    <li role="presentation"><a href="dodajOferte">Stworz oferte</a></li>
+                    <li role="presentation"><a href="mojeOferty">Moje oferty</a></li>
+                    <li role="presentation"><a href="mojeDane">Moje dane</a></li>
+                    <li role="presentation"><a href="logowanie">Logowanie</a></li>
+                    <li role="presentation"><a href="rejestracja">Tworzenie konta</a></li>
+                    <li role="presentation"><a href="wyloguj">Wyloguj sie</a></li>
+                </ul>
+            </nav>
+            <h3 style="color: green; text-align: left">{{msg}}</h3>
+        </div>
+
+        <h1>Lista dostepnych ofert</h1>
+
+        <hr>
+        {% for oferta in listaOfert %}
+        <!--<a href="#">
+        <h2>{{ oferta['nazwa_produktu'] }}</h2>
+    </a>-->
+        <h1 style="font-size:25px">{{ oferta['nazwa_produktu'] }}</h1>
+        <span>Ilosc: {{ oferta['ilosc_szt'] }}</span>
+        <br />
+        <span>Cena: {{ oferta['cena'] }}</span>
+        <br />
+        <span>Opis: {{ oferta['opis'] }}</span>
+        <br />
+        <span>Autor oferty: {{ oferta['login'] }}</span>
+        <hr>
+        {% endfor %}
+
+    </div>
+</body>
+
+</html>

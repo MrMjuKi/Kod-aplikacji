@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Tworzenie oferty</title>
+</head>
+
+<body>
+
+    <div class="container">
+        <div class="header">
+            <nav>
+                <ul class="naglowek">
+                    <li role="presentation"><a href="home">Strona domowa</a></li>
+                    <li role="presentation" class="active"><a href="#">Stworz oferte</a></li>
+                    <li role="presentation"><a href="mojeOferty">Moje oferty</a></li>
+                    <li role="presentation"><a href="mojeDane">Moje dane</a></li>
+                    <li role="presentation"><a href="logowanie">Logowanie</a></li>
+                    <li role="presentation"><a href="rejestracja">Tworzenie konta</a></li>
+                    <li role="presentation"><a href="wyloguj">Wyloguj sie</a></li>
+                </ul>
+            </nav>
+        </div>
+
+        <div class="formularz_dodawania_oferty">
+            <h1>Tworzenie oferty</h1>
+            <form method="POST">
+                <label for="inputNameOfProduct" class="sr-only">Nazwa produktu:</label>
+                <input type="text" name="inputNameOfProduct" id="inputNameOfProduct" class="form-control" placeholder="Nazwa produktu" autofocus>
+
+                <label for="inputDescription" class="sr-only">Opis:</label>
+                <input type="text" name="inputDescription" id="inputDescription" class="form-control" placeholder="Opis" autofocus>
+
+                <label for="inputAmount" class="sr-only">Ilosc sztuk:</label>
+                <input type="number" name="inputAmount" id="inputAmount" class="form-control" placeholder="Ilosc sztuk">
+
+                <label for="inputPrice" class="sr-only">Cena:</label>
+                <input type="text" name="inputPrice" id="inputPrice" class="form-control" placeholder="Cena">
+
+                <button type="submit">Stworz oferte</button>
+            </form>
+        </div>
+
+
+    </div>
+</body>
+</html>

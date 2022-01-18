@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Tworzenie konta</title>
+</head>
+
+<body>
+
+    <div class="container">
+        <div class="header">
+            <nav>
+                <ul class="naglowek">
+                    <li role="presentation"><a href="home">Strona domowa</a></li>
+                    <li role="presentation"><a href="dodajOferte">Stworz oferte</a></li>
+                    <li role="presentation"><a href="mojeOferty">Moje oferty</a></li>
+                    <li role="presentation"><a href="mojeDane">Moje dane</a></li>
+                    <li role="presentation"><a href="logowanie">Logowanie</a></li>
+                    <li role="presentation" class="active"><a href="#">Tworzenie konta</a></li>
+                    <li role="presentation"><a href="wyloguj">Wyloguj sie</a></li>
+                </ul>
+            </nav>
+        </div>
+
+        <div class="formularz_rejestracji">
+            <h1>Wprowadz dane i nacisnij "Utworz konto"</h1>
+            <form method="POST">
+                <label for="inputName" class="sr-only">Nazwa uzytkownika:</label>
+                <input type="text" name="inputUzytkownik" id="inputUzytkownik" class="form-control" placeholder="Nazwa uzytkownika" autofocus>
+
+                <label for="inputEmail" class="sr-only">Adres email:</label>
+                <input type="email" name="inputEmail" id="inputEmail" class="form-control" placeholder="Adres email" required autofocus>
+
+                <label for="inputPassword" class="sr-only">Haslo:</label>
+                <input type="password" name="inputHaslo" id="inputPassword" class="form-control" placeholder="Haslo" required>
+
+                <button type="submit">Utworz konto</button>
+            </form>
+        </div>
+
+
+    </div>
+</body>
+</html>
