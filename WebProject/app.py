@@ -17,9 +17,9 @@ mysql = MySQL(app)
 def listaOfert(IDuzytkownika):
     listaOfert = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
     if IDuzytkownika != 'ANY':
-        listaOfert.execute('SELECT uzytkownik.login, oferta.nazwa_produktu, oferta.opis, oferta.ilosc_szt, oferta.cena, oferta.ID_oferty FROM oferta INNER JOIN uzytkownik ON oferta.ID_uzytkownika=uzytkownik.ID_uzytkownika WHERE oferta.ID_uzytkownika = % s', (str(IDuzytkownika)))
+        listaOfert.execute('SELECT uzytkownik.login, oferta.nazwa_produktu, oferta.opis, oferta.liczba_sztuk, oferta.cena, oferta.ID_oferty FROM oferta INNER JOIN uzytkownik ON oferta.ID_uzytkownika=uzytkownik.ID_uzytkownika WHERE oferta.ID_uzytkownika = % s', (str(IDuzytkownika)))
     else:
-        listaOfert.execute('SELECT uzytkownik.login, oferta.nazwa_produktu, oferta.opis, oferta.ilosc_szt, oferta.cena FROM oferta INNER JOIN uzytkownik ON oferta.ID_uzytkownika=uzytkownik.ID_uzytkownika')
+        listaOfert.execute('SELECT uzytkownik.login, oferta.nazwa_produktu, oferta.opis, oferta.liczba_sztuk, oferta.cena FROM oferta INNER JOIN uzytkownik ON oferta.ID_uzytkownika=uzytkownik.ID_uzytkownika')
 
     mysql.connection.commit()
     listaOfert.close()
@@ -45,7 +45,7 @@ def rejestracja():
         haslo = request.form.get('inputHaslo')
 
         tworzenieKonta = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-        tworzenieKonta.execute('BEGIN; INSERT INTO uzytkownik (login, haslo, emial) VALUES ( % s, % s, % s); INSERT INTO personalne_dane (ID_uzytkownika) VALUES (last_insert_id()); COMMIT;', (uzytkownik, haslo, email ))
+        tworzenieKonta.execute('BEGIN; INSERT INTO uzytkownik (login, haslo) VALUES ( % s, % s); INSERT INTO personalia (ID_uzytkownika, `e-mail`) VALUES (last_insert_id(), % s); COMMIT;', (uzytkownik, haslo, email ))
         #mysql.connection.commit
         
         return render_template('index.html',listaOfert=listaOfert('ANY') ,msg ='Rejestracja przebiegla pomyslnie. Teraz mozesz sie zalogowac')
@@ -96,7 +96,7 @@ def dodawanieOferty():
         cena = request.form.get('inputPrice')
 
         dodanieOferty = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-        dodanieOferty.execute('INSERT INTO oferta (ID_uzytkownika, nazwa_produktu, opis, ilosc_szt, cena) VALUES ( % s, % s, % s, % s, % s)', (session['id'], nazwaProduktu, opis, ilosc, cena ))
+        dodanieOferty.execute('INSERT INTO oferta (ID_uzytkownika, nazwa_produktu, opis, liczba_sztuk, cena) VALUES ( % s, % s, % s, % s, % s)', (session['id'], nazwaProduktu, opis, ilosc, cena ))
 
         mysql.connection.commit()
 
@@ -127,9 +127,12 @@ def mojeDane():
         imie = request.form.get('inputName')
         nazwisko = request.form.get('inputSurname')
         telefon = request.form.get('inputNumber')
+        if telefon == 'None':
+            telefon = 0
+        email = request.form.get('inputEmail')
 
         aktualizacjaDanych = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-        aktualizacjaDanych.execute('UPDATE personalne_dane SET imie = % s, nazwisko = % s, nr_telefonu = % s WHERE ID_uzytkownika = % s', (imie, nazwisko, telefon, str(session['id']) ))
+        aktualizacjaDanych.execute('UPDATE personalia SET imie = % s, nazwisko = % s, nr_telefonu = % s, `e-mail` = % s WHERE ID_uzytkownika = % s', (imie, nazwisko, telefon, email, str(session['id']) ))
 
         mysql.connection.commit()
 
@@ -138,7 +141,7 @@ def mojeDane():
 
     mojeDane = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
 
-    mojeDane.execute('SELECT imie, nazwisko, nr_telefonu FROM personalne_dane WHERE ID_uzytkownika = % s', (str(session['id'])))
+    mojeDane.execute('SELECT imie, nazwisko, nr_telefonu, `e-mail` FROM personalia WHERE ID_uzytkownika = % s', (str(session['id'])))
     mysql.connection.commit()
     mojeDane.close()
     
