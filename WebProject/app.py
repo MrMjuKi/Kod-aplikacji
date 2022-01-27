@@ -82,7 +82,7 @@ def wyloguj():
     session.pop('id', None)
     session.pop('username', None)
 
-    return render_template('index.html' ,listaOfert=listaOfert('ANY'), msg ='Wylogowanie przegieblo pomyslnie')
+    return render_template('index.html' ,listaOfert=listaOfert('ANY'), msg ='Wylogowanie przebieglo pomyslnie')
 
 @app.route('/dodajOferte', methods=['GET', 'POST'])
 def dodawanieOferty():
@@ -151,4 +151,4 @@ def mojeDane():
 
 
 if __name__ == '__main__':
-    app.run('localhost', 4449)
+    app.run('0.0.0.0', 4449)
