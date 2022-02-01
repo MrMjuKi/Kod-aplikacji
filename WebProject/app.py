@@ -3,8 +3,15 @@ from flask.templating import render_template_string
 from flask_mysqldb import MySQL
 import MySQLdb.cursors
 
-app = Flask(__name__)
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
 
+import re
+
+from hashlib import blake2b
+
+app = Flask(__name__)
+limiter = Limiter(app, key_func=get_remote_address)
 app.secret_key = 'klucz'
   
 app.config['MYSQL_HOST'] = 'localhost'
@@ -43,16 +50,43 @@ def rejestracja():
         uzytkownik = request.form.get('inputUzytkownik')
         email = request.form.get('inputEmail')
         haslo = request.form.get('inputHaslo')
+        
+        if not uzytkownik.isalnum():
+            return render_template('index.html', msg ='Zla nazwa uzytkownika')
+
+        if not re.match('^[_a-z0-9-]+(\.[_a-z0-9-]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,4})$', email):
+            return render_template('index.html', msg ='Zly e-mail')
+        
+        if not haslo:
+            return render_template('index.html', msg ='Uzupelnij pole haslo')
+
+        szukanieEmailu = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+        szukanieEmailu.execute('SELECT `e-mail` FROM personalia WHERE `e-mail` =  % s', [email])
+        mysql.connection.commit
+        if szukanieEmailu.fetchone():
+            return render_template('index.html', msg ='Konto o podanym e-mailu istnieje')
+
+        szukanieLoginu = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+        szukanieLoginu.execute('SELECT * FROM uzytkownik WHERE login =  % s', [uzytkownik])
+        mysql.connection.commit
+        if szukanieLoginu.fetchone():
+            return render_template('index.html', msg ='Konto o podanym loginie istnieje')
+
+        if not re.search('[!@#$%^&*()\-_=+[{\]}\\|;:/?.>,<]', haslo) or not re.search('[a-z]', haslo) or  not re.search('[A-Z]', haslo) or not re.search('[0-9]', haslo) or len(haslo)<8:
+            return render_template('index.html', msg ='Zbyt slabe haslo')
+
+        hashHaslo = blake2b(('b'+haslo).encode('utf-8')).hexdigest()
 
         tworzenieKonta = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-        tworzenieKonta.execute('BEGIN; INSERT INTO uzytkownik (login, haslo) VALUES ( % s, % s); INSERT INTO personalia (ID_uzytkownika, `e-mail`) VALUES (last_insert_id(), % s); COMMIT;', (uzytkownik, haslo, email ))
-        #mysql.connection.commit
+        tworzenieKonta.execute('BEGIN; INSERT INTO uzytkownik (login, haslo) VALUES ( % s, % s); INSERT INTO personalia (ID_uzytkownika, `e-mail`) VALUES (last_insert_id(), % s); COMMIT;', (uzytkownik, hashHaslo, email ))
         
-        return render_template('index.html',listaOfert=listaOfert('ANY') ,msg ='Rejestracja przebiegla pomyslnie. Teraz mozesz sie zalogowac')
+        
+        return render_template('index.html' ,msg ='Rejestracja przebiegla pomyslnie. Teraz mozesz sie zalogowac')
 
     return render_template('rejestracja.html')
 
 @app.route('/logowanie', methods=['GET', 'POST'])
+@limiter.limit("5/hour", error_message='Osiagnieto limit pieciu prob zalogowania sie. Sprobuj za godzine')
 def logowanie():
     if session:
         return render_template('index.html' ,listaOfert=listaOfert('ANY'), msg ='Jestes juz zalogowany jako ' + str(session['username']))
@@ -60,9 +94,10 @@ def logowanie():
     if request.method == 'POST':
         uzytkownik = request.form.get('inputUzytkownik')
         haslo = request.form.get('inputHaslo')
+        hashHaslo = blake2b(('b'+haslo).encode('utf-8')).hexdigest()
 
         probaLogowania = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-        probaLogowania.execute('SELECT * FROM uzytkownik WHERE login = % s AND haslo = % s', (uzytkownik, haslo ))
+        probaLogowania.execute('SELECT * FROM uzytkownik WHERE login = % s AND haslo = % s', (uzytkownik, hashHaslo ))
 
         konto = probaLogowania.fetchone()
         if konto:
@@ -70,24 +105,24 @@ def logowanie():
             session['username'] = konto['login']
             return render_template('index.html' ,listaOfert=listaOfert('ANY'), msg ='Udalo sie zalogowac. Witaj ' + session['username'])
         else:
-            return render_template('index.html' ,listaOfert=listaOfert('ANY'), msg ='Nie udalo sie zalogowac. Wpisales zle haslo lub login.')
+            return render_template('index.html', msg ='Nie udalo sie zalogowac. Wpisales zle haslo lub login.')
 
     return render_template('logowanie.html')
 
 @app.route('/wyloguj')
 def wyloguj():
     if not session:
-        return render_template('index.html' ,listaOfert=listaOfert('ANY'), msg ='Nie jestes zalogowany na zadne konto')
+        return render_template('index.html', msg ='Nie jestes zalogowany na zadne konto')
 
     session.pop('id', None)
     session.pop('username', None)
 
-    return render_template('index.html' ,listaOfert=listaOfert('ANY'), msg ='Wylogowanie przebieglo pomyslnie')
+    return render_template('index.html', msg ='Wylogowanie przebieglo pomyslnie')
 
 @app.route('/dodajOferte', methods=['GET', 'POST'])
 def dodawanieOferty():
     if not session:
-        return render_template('index.html' ,listaOfert=listaOfert('ANY'), msg ='Zaloguj sie lub utworz konto, by dodac oferte')
+        return render_template('index.html', msg ='Zaloguj sie lub utworz konto, by dodac oferte')
 
     if request.method == 'POST':
         nazwaProduktu = request.form.get('inputNameOfProduct')
@@ -107,7 +142,7 @@ def dodawanieOferty():
 @app.route('/mojeOferty', methods=['GET', 'POST'])
 def mojeoferty():
     if not session:
-        return render_template('index.html' ,listaOfert=listaOfert('ANY'), msg ='Zaloguj sie, by zobaczyc swoje oferty')    
+        return render_template('index.html', msg ='Zaloguj sie, by zobaczyc swoje oferty')    
     
     if request.method == 'POST':
         usunOferte = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
@@ -121,7 +156,7 @@ def mojeoferty():
 @app.route('/mojeDane', methods=['GET', 'POST'])
 def mojeDane():
     if not session:
-        return render_template('index.html' ,listaOfert=listaOfert('ANY'), msg ='Zaloguj sie, by zobaczyc swoje dane')
+        return render_template('index.html', msg ='Zaloguj sie, by zobaczyc swoje dane')
 
     if request.method == 'POST':
         imie = request.form.get('inputName')
@@ -147,6 +182,11 @@ def mojeDane():
     
 
     return render_template('mojeDane.html', mojeDane=mojeDane)
+
+@app.errorhandler(429)
+@limiter.limit("2/day")
+def ratelimit_handler():
+  return "Przekroczyles limit zadan"
 
 
 
