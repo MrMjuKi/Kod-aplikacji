@@ -17,7 +17,7 @@ app.secret_key = 'klucz'
 app.config['MYSQL_HOST'] = 'localhost'
 app.config['MYSQL_USER'] = 'root'
 app.config['MYSQL_PASSWORD'] = 'admin'
-app.config['MYSQL_DB'] = 'daza_danych_ofert'
+app.config['MYSQL_DB'] = 'baza_danych_ofert'
   
 mysql = MySQL(app)
 
